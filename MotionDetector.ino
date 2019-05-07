@@ -1,4 +1,4 @@
-/* Hamshield
+/* Hamshield Motion Detector with PIR Sensor
  * Example: AFSK Serial Messenger
  * Serial glue to send messages over APRS. You will need a 
  * seperate AFSK receiver to test the output of this example.
@@ -13,6 +13,7 @@
  * Send the following over the serial link:
  * `from,to,:message
  * example: * KE8JCT,KE8JCT,:Hi there TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST`
+ * For use with Hamshield Mini and Arduino mini
  */
 
 
@@ -24,17 +25,17 @@
 
 #define MIC_PIN 3
 #define RESET_PIN A3
-//#define SWITCH_PIN 2
+//#define SWITCH_PIN 2 don't need it
 
-//int ledPin = 7;                // choose the pin for the LED
+//int ledPin = 7;                // choose the pin for the LED, don't need
 int inputPin = 2;               // choose the input pin (for PIR sensor)
 int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading
 
-HamShield radio(A0, A3, A1); // nCS, CLK, DAT
+HamShield radio(A0, A3, A1); // nCS, CLK, DAT, custom config from Arduino Mini
 DDS dds;
 AFSK afsk;
-String messagebuff =  "KE0VMS,KE8JCT,:MOTION DETECTED`";
+String messagebuff =  "KE0VMS,KE8JCT,:MOTION DETECTED`"; //two callsigns
 //String origin_call = messagebuff.substring(0,messagebuff.indexOf(','));                                          // get originating callsign
 //String destination_call = messagebuff.substring(messagebuff.indexOf(',')+1,messagebuff.indexOf(',',messagebuff.indexOf(',')+1)); // get the destination call
 //String textmessage = messagebuff.substring(messagebuff.indexOf(":")+1);
@@ -63,7 +64,7 @@ void setup() {
   Serial.begin(9600);
 
   radio.initialize();
-  radio.frequency(145570);  //CHANGE TO APRS
+  radio.frequency(145570);  
   radio.setRfPower(0);
   radio.setVolume1(0xFF);
   radio.setVolume2(0xFF);
@@ -133,50 +134,7 @@ void loop() {
       }
    
 }
-//void prepMessage() { 
-//   radio.setModeTransmit();
-//  delay(1000);
-//  //origin_call = messagebuff.substring(0,messagebuff.indexOf(','));                                          // get originating callsign
-//  //destination_call = messagebuff.substring(messagebuff.indexOf(',')+1,messagebuff.indexOf(',',messagebuff.indexOf(',')+1)); // get the destination call
-//  //textmessage = messagebuff.substring(messagebuff.indexOf(":")+1);
-//  
-// // Serial.print("From: "); Serial.print(origin_call); Serial.print(" To: "); Serial.println(destination_call); Serial.println("Text: "); Serial.println(textmessage);
-//
-//  AFSK::Packet *packet = AFSK::PacketBuffer::makePacket(22 + 32);
-//
-//  packet->start();
-//  packet->appendCallsign(origin_call.c_str(),0);
-//  packet->appendCallsign(destination_call.c_str(),15,true);   
-//  packet->appendFCS(0x03);
-//  packet->appendFCS(0xf0);
-//  packet->print(textmessage);
-//  packet->finish();
-//
-//  bool ret = afsk.putTXPacket(packet);
-//
-//  if(afsk.txReady()) {
-//    Serial.println(F("txReady"));
-//    radio.setModeTransmit();
-//    //delay(100);
-//    if(afsk.txStart()) {
-//      Serial.println(F("txStart"));
-//    } else {
-//      radio.setModeReceive();
-//    }
-//  }
-//  // Wait 2 seconds before we send our beacon again.
-//  Serial.println("tick");
-//  // Wait up to 2.5 seconds to finish sending, and stop transmitter.
-//  // TODO: This is hackery.
-//  for(int i = 0; i < 500; i++) {
-//    if(afsk.encoder.isDone())
-//       break;
-//    delay(50);
-//  }
-//  Serial.println("Done sending");
-//  radio.setModeReceive();
-//  messagebuff = "";
-//} 
+
 
 ISR(TIMER2_OVF_vect) {
   TIFR2 = _BV(TOV2);
